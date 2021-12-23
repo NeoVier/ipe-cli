@@ -7,9 +7,11 @@
     "build": "tsc && snowpack build",
     "postinstall": "elm-tooling install",
     "dev": "elm-ts-interop --output src/Main.elm.d.ts --watch",
-    "gen:ts-interop": "elm-ts-interop --output src/Main.elm.d.ts"
+    "gen:ts-interop": "elm-ts-interop --output src/Main.elm.d.ts",
+    "review:elm": "elm-review"
   },
   "devDependencies": {
+    "elm-review": "^2.7.0",
     "elm-tooling": "^1.7.0",
     "elm-ts-interop": "^0.0.8",
     "snowpack": "^3.8.8",
