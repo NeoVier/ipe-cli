@@ -1,0 +1,23 @@
+{
+  "name": "ipe",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc && snowpack build",
+    "postinstall": "elm-tooling install",
+    "dev": "elm-ts-interop --output src/Main.elm.d.ts --watch",
+    "gen:ts-interop": "elm-ts-interop --output src/Main.elm.d.ts"
+  },
+  "devDependencies": {
+    "elm-tooling": "^1.7.0",
+    "elm-ts-interop": "^0.0.8",
+    "snowpack": "^3.8.8",
+    "snowpack-plugin-elm": "^0.5.1"
+  },
+  "dependencies": {
+    "@snowpack/plugin-typescript": "^1.2.1",
+    "elm": "^0.19.1-5",
+    "typescript": "^4.5.4"
+  }
+}
