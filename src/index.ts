@@ -1,7 +1,7 @@
-import Elm from "./Main.elm";
+import Elm from './Main.elm'
 
 Elm.Main.init({
-    flags: null
+  flags: null
 })
 
 console.log('Elm with snowpack!')

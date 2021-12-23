@@ -8,12 +8,21 @@
     "postinstall": "elm-tooling install",
     "dev": "elm-ts-interop --output src/Main.elm.d.ts --watch",
     "gen:ts-interop": "elm-ts-interop --output src/Main.elm.d.ts",
-    "review:elm": "elm-review"
+    "review:elm": "elm-review",
+    "review:ts": "eslint src/**/**.ts",
+    "review": "elm-review && eslint src/**/**.ts"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.8.0",
+    "@typescript-eslint/parser": "^5.8.0",
     "elm-review": "^2.7.0",
     "elm-tooling": "^1.7.0",
     "elm-ts-interop": "^0.0.8",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
     "snowpack": "^3.8.8",
     "snowpack-plugin-elm": "^0.5.1"
   },
