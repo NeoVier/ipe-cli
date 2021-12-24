@@ -9,12 +9,14 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 12,
-    sourceType: 'module'
+    sourceType: 'module',
+    project: './tsconfig.json'
   },
   plugins: [
     '@typescript-eslint'
   ],
   ignorePatterns: ["src/Main.elm.d.ts"],
   rules: {
+    '@typescript-eslint/switch-exhaustiveness-check': 'error'
   }
 }
