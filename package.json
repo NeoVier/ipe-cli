@@ -4,13 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && snowpack build",
+    "build": "tsc && node ./build.js",
     "postinstall": "elm-tooling install",
-    "dev": "elm-ts-interop --output src/Main.elm.d.ts --watch",
+    "watch": "concurrently --kill-others \"yarn watch:ts-interop\" \"yarn watch:elm\" \"yarn watch:ts\"",
+    "watch:ts-interop": "yarn gen:ts-interop --watch",
+    "watch:elm": "node ./build.js --watch",
+    "watch:ts": "tsc --noEmit --preserveWatchOutput --watch",
     "gen:ts-interop": "elm-ts-interop --output src/Main.elm.d.ts",
     "review:elm": "elm-review",
     "review:ts": "eslint src/**/**.ts",
-    "review": "elm-review && eslint src/**/**.ts"
+    "review": "yarn review:elm && yarn review:ts"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.8.0",
@@ -18,17 +21,17 @@
     "elm-review": "^2.7.0",
     "elm-tooling": "^1.7.0",
     "elm-ts-interop": "^0.0.8",
+    "esbuild-plugin-elm": "^0.0.8",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0",
-    "snowpack": "^3.8.8",
-    "snowpack-plugin-elm": "^0.5.1"
+    "eslint-plugin-promise": "^5.2.0"
   },
   "dependencies": {
-    "@snowpack/plugin-typescript": "^1.2.1",
+    "concurrently": "^6.5.1",
     "elm": "^0.19.1-5",
+    "esbuild": "^0.14.8",
     "typescript": "^4.5.4"
   }
 }

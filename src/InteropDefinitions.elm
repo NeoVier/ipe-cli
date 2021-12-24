@@ -2,6 +2,7 @@ module InteropDefinitions exposing (Flags, FromElm(..), ToElm(..), interop)
 
 import Json.Encode
 import TsJson.Decode as TsDecode exposing (Decoder)
+import TsJson.Decode.Pipeline as TsDecodePipeline
 import TsJson.Encode as TsEncode exposing (Encoder, optional, required)
 
 
@@ -18,7 +19,8 @@ interop =
 
 
 type FromElm
-    = Alert String
+    = PrintAndExitFailure String
+    | PrintAndExitSuccess String
 
 
 type ToElm
@@ -30,18 +32,25 @@ type alias User =
 
 
 type alias Flags =
-    {}
+    { argv : List String
+    , versionMessage : String
+    }
 
 
 fromElm : Encoder FromElm
 fromElm =
     TsEncode.union
-        (\vAlert value ->
+        (\vPrintAndExitFailure vPrintAndExitSuccess value ->
             case value of
-                Alert string ->
-                    vAlert string
+                PrintAndExitFailure string ->
+                    vPrintAndExitFailure string
+
+                PrintAndExitSuccess string ->
+                    vPrintAndExitSuccess string
         )
-        |> TsEncode.variantTagged "alert"
+        |> TsEncode.variantTagged "exitFailure"
+            (TsEncode.object [ required "message" identity TsEncode.string ])
+        |> TsEncode.variantTagged "exitSuccess"
             (TsEncode.object [ required "message" identity TsEncode.string ])
         |> TsEncode.buildUnion
 
@@ -60,4 +69,6 @@ toElm =
 
 flags : Decoder Flags
 flags =
-    TsDecode.null {}
+    TsDecode.succeed Flags
+        |> TsDecodePipeline.required "argv" (TsDecode.list TsDecode.string)
+        |> TsDecodePipeline.required "versionMessage" TsDecode.string

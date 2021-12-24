@@ -1,7 +1,11 @@
-import Elm from './Main.elm'
+import { Elm } from './Main.elm'
 
-Elm.Main.init({
-  flags: null
+const app = Elm.Main.init({
+  flags: {
+    argv: [],
+    // TODO
+    versionMessage: ''
+  }
 })
 
-console.log('Elm with snowpack!')
+console.log(app)
