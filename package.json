@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && node ./build.js",
+    "build": "NODE_ENV=production tsc && NODE_ENV=production node ./build.js",
+    "execute": "tsc && node ./build.js && node ./dist/index.js",
     "postinstall": "elm-tooling install",
     "watch": "concurrently --kill-others \"yarn watch:ts-interop\" \"yarn watch:elm\" \"yarn watch:ts\"",
     "watch:ts-interop": "yarn gen:ts-interop --watch",
