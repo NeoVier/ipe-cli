@@ -1,57 +1,109 @@
-module Main exposing (main)
+module Main exposing (CliOptions, Model, Msg, main)
 
+import Cli.Option
+import Cli.OptionsParser
+import Cli.OptionsParser.BuilderState
 import Cli.Program
+import File exposing (File)
 import InteropDefinitions
 import InteropPorts
+import Json.Decode
+import Json.Encode
 
 
-
--- main : Program (Cli.Program.FlagsIncludingArgv InteropDefinitions.Flags) (Cli.Program.StatefulProgramModel Model CliOptions) Msg
--- main : Cli.Program.StatefulProgram Model Msg CliOptions InteropDefinitions.Flags
-
-
+main : Cli.Program.StatefulProgram Model Msg CliOptions { otherFlags : Json.Encode.Value }
 main =
     Cli.Program.stateful
-        { printAndExitFailure =
+        { config = config
+        , init = init
+        , printAndExitFailure =
             InteropDefinitions.PrintAndExitFailure
                 >> InteropPorts.fromElm
         , printAndExitSuccess =
             InteropDefinitions.PrintAndExitSuccess
                 >> InteropPorts.fromElm
-        , init = init
-        , update = update
         , subscriptions = subscriptions
-        , config = config
+        , update = update
         }
 
 
 type CliOptions
-    = NoOptions
+    = CompileFile MakeOptions
+
+
+type alias MakeOptions =
+    { filename : String
+    }
 
 
 config : Cli.Program.Config CliOptions
 config =
     Cli.Program.config
+        |> Cli.Program.add (Cli.OptionsParser.map CompileFile buildCommand)
+
+
+buildCommand : Cli.OptionsParser.OptionsParser MakeOptions Cli.OptionsParser.BuilderState.AnyOptions
+buildCommand =
+    Cli.OptionsParser.buildSubCommand "make" MakeOptions
+        |> Cli.OptionsParser.with (Cli.Option.requiredPositionalArg "filename")
 
 
 type alias Model =
     {}
 
 
-init : InteropDefinitions.Flags -> CliOptions -> ( Model, Cmd Msg )
-init _ _ =
-    ( {}, Cmd.none )
+init :
+    Cli.Program.FlagsIncludingArgv { otherFlags : Json.Encode.Value }
+    -> CliOptions
+    -> ( Model, Cmd Msg )
+init { otherFlags } (CompileFile { filename }) =
+    case InteropPorts.decodeFlags otherFlags of
+        Ok _ ->
+            ( {}
+            , InteropDefinitions.RequestedFile filename
+                |> InteropPorts.fromElm
+            )
+
+        Err error ->
+            ( {}
+            , Json.Decode.errorToString error
+                |> InteropDefinitions.PrintAndExitFailure
+                |> InteropPorts.fromElm
+            )
 
 
 type Msg
-    = NoOp
+    = GotFile File
+    | GotErrorDecodingToElmPort Json.Decode.Error
 
 
 update : CliOptions -> Msg -> Model -> ( Model, Cmd Msg )
-update _ _ _ =
-    ( {}, Cmd.none )
+update _ msg _ =
+    case msg of
+        GotFile file ->
+            ( {}
+            , ("Successfuly read file `" ++ File.name file ++ "`")
+                |> InteropDefinitions.PrintAndExitSuccess
+                |> InteropPorts.fromElm
+            )
+
+        GotErrorDecodingToElmPort error ->
+            ( {}
+            , Json.Decode.errorToString error
+                |> InteropDefinitions.PrintAndExitFailure
+                |> InteropPorts.fromElm
+            )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    InteropPorts.toElm
+        |> Sub.map
+            (\toElm ->
+                case toElm of
+                    Ok (InteropDefinitions.GotFile file) ->
+                        GotFile file
+
+                    Err error ->
+                        GotErrorDecodingToElmPort error
+            )
