@@ -1,6 +1,5 @@
-module InteropDefinitions exposing (Flags, FromElm(..), ToElm(..), interop)
+module InteropDefinitions exposing (FileInfo, Flags, FromElm(..), ToElm(..), interop)
 
-import File
 import TsJson.Decode as TsDecode exposing (Decoder)
 import TsJson.Decode.Pipeline as TsDecodePipeline
 import TsJson.Encode as TsEncode exposing (Encoder, required)
@@ -25,7 +24,12 @@ type FromElm
 
 
 type ToElm
-    = GotFile File.File
+    = GotFile FileInfo
+
+
+type alias FileInfo =
+    -- TODO - Move to another module?
+    { contents : String }
 
 
 type alias Flags =
@@ -62,15 +66,15 @@ toElm : Decoder ToElm
 toElm =
     TsDecode.discriminatedUnion "tag"
         [ ( "gotFile"
-          , TsDecode.map GotFile (TsDecode.field "data" fileDecoder)
+          , TsDecode.map GotFile (TsDecode.field "file" fileInfoDecoder)
           )
         ]
 
 
-fileDecoder : Decoder File.File
-fileDecoder =
-    TsDecode.succeed ()
-        |> TsDecode.unknownAndThen (\_ -> File.decoder)
+fileInfoDecoder : Decoder FileInfo
+fileInfoDecoder =
+    TsDecode.map FileInfo
+        (TsDecode.field "contents" TsDecode.string)
 
 
 flags : Decoder Flags

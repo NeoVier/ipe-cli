@@ -24,11 +24,15 @@ app.ports.interopFromElm.subscribe((fromElm) => {
     case 'requestedFile': {
       fs.readFile(fromElm.data.filename, (err, data) => {
         if (err) {
-          // TODO
           throw err
         }
 
-        app.ports.interopToElm.send({ tag: 'gotFile', file: data })
+        console.log(data.toString())
+
+        app.ports.interopToElm.send({
+          tag: 'gotFile',
+          file: { contents: data.toString() }
+        })
       })
       break
     }

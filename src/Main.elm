@@ -4,7 +4,6 @@ import Cli.Option
 import Cli.OptionsParser
 import Cli.OptionsParser.BuilderState
 import Cli.Program
-import File exposing (File)
 import InteropDefinitions
 import InteropPorts
 import Json.Decode
@@ -73,7 +72,7 @@ init { otherFlags } (CompileFile { filename }) =
 
 
 type Msg
-    = GotFile File
+    = GotFile InteropDefinitions.FileInfo
     | GotErrorDecodingToElmPort Json.Decode.Error
 
 
@@ -82,7 +81,7 @@ update _ msg _ =
     case msg of
         GotFile file ->
             ( {}
-            , ("Successfuly read file `" ++ File.name file ++ "`")
+            , ("Successfuly read file\n" ++ file.contents)
                 |> InteropDefinitions.PrintAndExitSuccess
                 |> InteropPorts.fromElm
             )
