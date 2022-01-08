@@ -1,8 +1,8 @@
 {
-  "name": "ipe",
+  "name": "ipe-cli",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "scripts": {
     "build": "NODE_ENV=production tsc && NODE_ENV=production node ./build.js",
     "execute": "tsc && node ./build.js && node ./dist/index.js",
